@@ -46,7 +46,7 @@ class BookViewSet(viewsets.ModelViewSet):
         return BookSerializer
 
 
-class BorrowingView(
+class BorrowingViewSet(
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
     mixins.RetrieveModelMixin,
