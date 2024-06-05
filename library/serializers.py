@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
 from library.models import Book, Borrowing, Payment
@@ -58,7 +59,7 @@ class BorrowingSerializer(serializers.ModelSerializer):
     )
     user = UserSerializer(read_only=True)
     user_id = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(), source="user", write_only=True
+        queryset=get_user_model().objects.all(), source="user", write_only=True
     )
 
     class Meta:
