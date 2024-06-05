@@ -45,3 +45,18 @@ class UserSerializer(serializers.ModelSerializer):
             user.save()
 
         return user
+
+
+class UserProfileSerializer(UserSerializer):
+    class Meta:
+        model = get_user_model()
+        fields = (
+            "id",
+            "username",
+            "email",
+            "first_name",
+            "last_name",
+            "full_name",
+            "is_staff",
+            "date_joined"
+        )
