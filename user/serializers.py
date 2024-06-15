@@ -4,9 +4,6 @@ from django.contrib.auth import get_user_model
 
 
 class UserSerializer(serializers.ModelSerializer):
-    subscribers = serializers.SerializerMethodField()
-    subscriptions = serializers.SerializerMethodField()
-
     class Meta:
         model = get_user_model()
         fields = (
@@ -20,7 +17,7 @@ class UserSerializer(serializers.ModelSerializer):
             "password",
             "date_joined"
         )
-        read_only_fields = ("is_staff", "date_joined")
+        read_only_fields = ("is_staff", "date_joined",)
         extra_kwargs = {
             "password": {
                 "write_only": True,

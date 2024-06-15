@@ -26,9 +26,9 @@ class Book(models.Model):
 
 
 class Borrowing(models.Model):
-    borrow_date = models.DateField()
-    expected_return_date = models.DateField()
-    actual_return_date = models.DateField(null=True, blank=True)
+    borrow_date = models.DateTimeField()
+    expected_return_date = models.DateTimeField()
+    actual_return_date = models.DateTimeField(null=True, blank=True)
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE

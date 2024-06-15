@@ -32,26 +32,6 @@ class BookListSerializer(serializers.ModelSerializer):
         )
 
 
-class BookDetailSerializer(serializers.ModelSerializer):
-    borrowings = serializers.SerializerMethodField()
-
-    def get_borrowings(self, obj):
-        borrowings = Borrowing.objects.filter(book=obj)
-        return BorrowingSerializer(borrowings, many=True).data
-
-    class Meta:
-        model = Book
-        fields = (
-            "id",
-            "title",
-            "author",
-            "cover",
-            "inventory",
-            "daily_fee",
-            "borrowings",
-        )
-
-
 class BorrowingSerializer(serializers.ModelSerializer):
     book = BookSerializer(read_only=True)
     book_id = serializers.PrimaryKeyRelatedField(
@@ -77,17 +57,59 @@ class BorrowingSerializer(serializers.ModelSerializer):
 
 
 class BorrowingListSerializer(BorrowingSerializer):
-    user = UserSerializer(source="username", read_only=True)
+    username = serializers.CharField(source="user.username", read_only=True)
+    full_name = serializers.CharField(source="user.full_name", read_only=True)
 
     class Meta:
         model = Borrowing
         fields = (
             "id",
             "book",
-            "user",
+            "username",
+            "full_name",
             "borrow_date",
             "expected_return_date",
             "actual_return_date",
+        )
+
+
+class BorrowingInBookListSerializer(BorrowingSerializer):
+    username = serializers.CharField(source="user.username", read_only=True)
+    full_name = serializers.CharField(source="user.full_name", read_only=True)
+    is_staff = serializers.BooleanField(
+        source="user.is_staff", read_only=True
+    )
+
+    class Meta:
+        model = Borrowing
+        fields = (
+            "id",
+            "username",
+            "full_name",
+            "is_staff",
+            "borrow_date",
+            "expected_return_date",
+            "actual_return_date",
+        )
+
+
+class BookDetailSerializer(serializers.ModelSerializer):
+    borrowings = serializers.SerializerMethodField()
+
+    def get_borrowings(self, obj):
+        borrowings = Borrowing.objects.filter(book=obj)
+        return BorrowingInBookListSerializer(borrowings, many=True).data
+
+    class Meta:
+        model = Book
+        fields = (
+            "id",
+            "title",
+            "author",
+            "cover",
+            "inventory",
+            "daily_fee",
+            "borrowings",
         )
 
 
