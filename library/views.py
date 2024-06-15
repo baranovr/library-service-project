@@ -1,6 +1,8 @@
 import stripe
 
 from django.utils import timezone
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 
 from rest_framework import viewsets, mixins, status, permissions
 from rest_framework.decorators import action
@@ -56,6 +58,37 @@ class BookViewSet(viewsets.ModelViewSet):
 
         return BookSerializer
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "title",
+                type=OpenApiTypes.STR,
+                style="form",
+                description=(
+                        "Filter by book title"
+                )
+            ),
+            OpenApiParameter(
+                "author",
+                type=OpenApiTypes.STR,
+                style="form",
+                description=(
+                        "Filter by author"
+                )
+            ),
+            OpenApiParameter(
+                "cover",
+                type=OpenApiTypes.STR,
+                style="form",
+                description=(
+                        "Filter by book cover type"
+                )
+            )
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
 
 class BorrowingViewSet(
     mixins.ListModelMixin,
@@ -99,19 +132,42 @@ class BorrowingViewSet(
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def get_queryset(self):
-        queryset = super().get_queryset()
-        user_id = self.request.query_params.get("user_id", None)
-        is_active = self.request.query_params.get("is_active", None)
+        borrow_date = self.request.query_params.get("borrow_date", None)
+        expected_return_date = self.request.query_params.get(
+            "expected_return_date", None
+        )
+        actual_return_date = self.request.query_params.get(
+            "actual_return_date", None
+        )
+        book_title = self.request.query_params.get(
+            "borrowing__book__title", None
+        )
+        user = self.request.query_params.get(
+            "borrowing__user__username", None
+        )
 
-        if user_id:
-            queryset = queryset.filter(user_id=user_id)
+        queryset = self.queryset
 
-        if is_active is not None:
-            is_active = is_active.lower() == "true"
-            if is_active:
-                queryset = queryset.filter(actual_return_date__isnull=True)
-            else:
-                queryset = queryset.filter(actual_return_date__isnull=False)
+        if borrow_date:
+            b_date = datetime.strptime(borrow_date, "%Y-%m-%d").date()
+            queryset = queryset.filter(borrow_date__date=b_date)
+
+        if expected_return_date:
+            e_date = datetime.strptime(expected_return_date,
+                                       "%Y-%m-%d").date()
+            queryset = queryset.filter(expected_return_date__date=e_date)
+
+        if actual_return_date:
+            a_date = datetime.strptime(actual_return_date, "%Y-%m-%d").date()
+            queryset = queryset.filter(actual_return_date__date=a_date)
+
+        if book_title:
+            queryset = queryset.filter(book__title__icontains=book_title)
+            return queryset.distinct()
+
+        if user:
+            queryset = queryset.filter(user__username__icontains=user)
+            return queryset.distinct()
 
         return queryset
 
@@ -120,6 +176,56 @@ class BorrowingViewSet(
             return BorrowingListSerializer
 
         return BorrowingSerializer
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "borrow_date",
+                type=OpenApiTypes.DATE,
+                style="form",
+                description=(
+                        "Filter by borrow date "
+                        "(ex. ?date=20024-04-05)"
+                )
+            ),
+            OpenApiParameter(
+                "expected_return_date",
+                type=OpenApiTypes.DATE,
+                style="form",
+                description=(
+                        "Filter by expected return date "
+                        "(ex. ?date=20024-04-05)"
+                )
+            ),
+            OpenApiParameter(
+                "actual_return_date",
+                type=OpenApiTypes.DATE,
+                style="form",
+                description=(
+                        "Filter by actual return date "
+                        "(ex. ?date=20024-04-05)"
+                )
+            ),
+            OpenApiParameter(
+                "book_title",
+                type=OpenApiTypes.STR,
+                style="form",
+                description=(
+                        "Filter by book title"
+                )
+            ),
+            OpenApiParameter(
+                "username",
+                type=OpenApiTypes.STR,
+                style="form",
+                description=(
+                        "Filter by user (username)"
+                )
+            ),
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
     @action(detail=True, methods=["POST"])
     def return_book(self, request, pk=None):
