@@ -49,6 +49,12 @@ class BookViewSet(viewsets.ModelViewSet):
 
         return queryset.distinct()
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(user=self.request.user)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
     def get_serializer_class(self):
         if self.action == "list":
             return BookListSerializer
@@ -111,6 +117,7 @@ class BorrowingViewSet(
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        serializer.save(user=self.request.user)
         book = serializer.validated_data["book"]
 
         if book.inventory > 0:
@@ -290,6 +297,7 @@ class PaymentViewSet(
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        serializer.save(user=self.request.user)
         payment = serializer.save()
 
         session = stripe.checkout.Session.create(
