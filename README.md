@@ -100,8 +100,7 @@ $ python manage.py migrate
 
 <hr>
 
-<h2>🔔Telegram notifications</h2>
-![telegram](2111646.png)
+<h2>![telegram](icon.png) Telegram notifications</h2>
 <h5>The service has the ability to receive notifications during the creation of a new book, 
 new borrowing and deletion of a book.</h5>
 
