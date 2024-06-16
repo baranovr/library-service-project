@@ -8,10 +8,10 @@ from rest_framework import viewsets, mixins, status, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from library.send_notifications import send_telegram_notification
+from backend.library.send_notifications import send_telegram_notification
 
-from library.models import Book, Borrowing, Payment
-from library.serializers import (
+from backend.library.models import Book, Borrowing, Payment
+from backend.library.serializers import (
     BookSerializer,
     BookListSerializer,
     BookDetailSerializer,

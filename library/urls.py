@@ -1,7 +1,7 @@
 from rest_framework import routers
 from django.urls import path
 
-from library.views import (
+from backend.library.views import (
     BookViewSet,
     BorrowingViewSet,
     PaymentViewSet
