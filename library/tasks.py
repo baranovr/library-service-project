@@ -1,7 +1,7 @@
 from celery import shared_task
 
-from backend.library.models import Borrowing
-from backend.library.send_notifications import send_telegram_notification
+from library.models import Borrowing
+from library.send_notifications import send_telegram_notification
 
 
 @shared_task

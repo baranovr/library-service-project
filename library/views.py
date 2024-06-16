@@ -8,10 +8,10 @@ from rest_framework import viewsets, mixins, status, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from backend.library.send_notifications import send_telegram_notification
+from library.send_notifications import send_telegram_notification
 
-from backend.library.models import Book, Borrowing, Payment
-from backend.library.serializers import (
+from library.models import Book, Borrowing, Payment
+from library.serializers import (
     BookSerializer,
     BookListSerializer,
     BookDetailSerializer,
@@ -300,6 +300,10 @@ class PaymentViewSet(
         serializer.save(user=self.request.user)
         payment = serializer.save()
 
+        borrowing = payment.borrowing
+        days = (borrowing.actual_return_date - borrowing.borrow_date).days
+        payment.money_to_pay = borrowing.book.daily_fee * days
+
         session = stripe.checkout.Session.create(
             payment_method_types=["card"],
             line_items=[{
@@ -307,9 +311,7 @@ class PaymentViewSet(
                     "currency": "usd",
                     "unit_amount": int(payment.money_to_pay * 100),
                     "product_data": {
-                        "name": f"Payment for Borrowing #{
-                        payment.borrowing.id
-                        }",
+                        "name": f"Payment for Borrowing #{borrowing.id}",
                     },
                 },
                 "quantity": 1,

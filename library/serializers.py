@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from backend.library.models import Book, Borrowing, Payment
+from library.models import Book, Borrowing, Payment
 
 from user.serializers import UserSerializer
 
