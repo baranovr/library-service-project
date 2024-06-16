@@ -196,7 +196,9 @@ $ python manage.py createsuperuser
    |    |-- admin.py                        # Registration models in admin page 
    |    |-- apps.py
    |    |-- models.py                       # All app models
+   |    |-- send_notifications.py           # File for sending notifications
    |    |-- serializers.py                  # All app serializers
+   |    |-- tasks.py                        # Celery tasks
    |    |
    |    |-- urls.py                         # Paths for pages
    |    |-- views.py                        # All project views
