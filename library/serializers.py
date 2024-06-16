@@ -32,6 +32,26 @@ class BookListSerializer(serializers.ModelSerializer):
         )
 
 
+class BookDetailSerializer(serializers.ModelSerializer):
+    borrowings = serializers.SerializerMethodField()
+
+    def get_borrowings(self, obj):
+        borrowings = Borrowing.objects.filter(book=obj)
+        return BorrowingSerializer(borrowings, many=True).data
+
+    class Meta:
+        model = Book
+        fields = (
+            "id",
+            "title",
+            "author",
+            "cover",
+            "inventory",
+            "daily_fee",
+            "borrowings",
+        )
+
+
 class BorrowingSerializer(serializers.ModelSerializer):
     book = BookSerializer(read_only=True)
     book_id = serializers.PrimaryKeyRelatedField(
@@ -90,26 +110,6 @@ class BorrowingInBookListSerializer(BorrowingSerializer):
             "borrow_date",
             "expected_return_date",
             "actual_return_date",
-        )
-
-
-class BookDetailSerializer(serializers.ModelSerializer):
-    borrowings = serializers.SerializerMethodField()
-
-    def get_borrowings(self, obj):
-        borrowings = Borrowing.objects.filter(book=obj)
-        return BorrowingInBookListSerializer(borrowings, many=True).data
-
-    class Meta:
-        model = Book
-        fields = (
-            "id",
-            "title",
-            "author",
-            "cover",
-            "inventory",
-            "daily_fee",
-            "borrowings",
         )
 
 

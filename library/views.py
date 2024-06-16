@@ -7,6 +7,7 @@ from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import viewsets, mixins, status, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
 
 from library.send_notifications import send_telegram_notification
 
@@ -21,9 +22,15 @@ from library.serializers import (
 )
 
 
+class Pagination(PageNumberPagination):
+    page_size = 5
+    max_page_size = 10
+
+
 class BookViewSet(viewsets.ModelViewSet):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
+    pagination_class = Pagination
 
     def get_permissions(self):
         if self.action == "list" or self.action == "retrieve":
@@ -35,7 +42,6 @@ class BookViewSet(viewsets.ModelViewSet):
         title = self.request.query_params.get("title", None)
         author = self.request.query_params.get("author", None)
         cover = self.request.query_params.get("cover", None)
-
         queryset = self.queryset
 
         if title:
@@ -48,12 +54,6 @@ class BookViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(cover__icontains=cover)
 
         return queryset.distinct()
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save(user=self.request.user)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -105,6 +105,7 @@ class BorrowingViewSet(
 ):
     queryset = Borrowing.objects.all()
     serializer_class = BorrowingSerializer
+    pagination_class = Pagination
 
     def get_permissions(self):
         if self.action == "list":
@@ -117,14 +118,11 @@ class BorrowingViewSet(
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save(user=self.request.user)
         book = serializer.validated_data["book"]
-
         if book.inventory > 0:
             book.inventory -= 1
             book.save()
             borrowing = serializer.save()
-
             message = (
                 f"BOOK BORROWING 📖\n"
                 f"\n"
@@ -132,8 +130,8 @@ class BorrowingViewSet(
                 f"User👤:  {borrowing.user.username}\n"
                 f"Book📖:  {borrowing.book.title}\n"
             )
-            send_telegram_notification(message)
 
+            send_telegram_notification(message)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -152,7 +150,6 @@ class BorrowingViewSet(
         user = self.request.query_params.get(
             "borrowing__user__username", None
         )
-
         queryset = self.queryset
 
         if borrow_date:
@@ -160,8 +157,9 @@ class BorrowingViewSet(
             queryset = queryset.filter(borrow_date__date=b_date)
 
         if expected_return_date:
-            e_date = datetime.strptime(expected_return_date,
-                                       "%Y-%m-%d").date()
+            e_date = datetime.strptime(
+                expected_return_date, "%Y-%m-%d"
+            ).date()
             queryset = queryset.filter(expected_return_date__date=e_date)
 
         if actual_return_date:
@@ -231,6 +229,7 @@ class BorrowingViewSet(
             ),
         ]
     )
+
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
@@ -242,14 +241,11 @@ class BorrowingViewSet(
                 {"detail": "Book already returned"},
                 status=status.HTTP_400_BAD_REQUEST
             )
-
         borrowing.actual_return_date = timezone.now()
         borrowing.save()
-
         book = borrowing.book
         book.inventory += 1
         book.save()
-
         message = (
             f"BOOK RETURNED ↩️\n"
             f"\n"
@@ -258,7 +254,6 @@ class BorrowingViewSet(
             f"Book📖:  {borrowing.book.title}\n"
         )
         send_telegram_notification(message)
-
         return Response(
             {"detail": "Book returned successfully"},
             status=status.HTTP_200_OK
@@ -266,10 +261,8 @@ class BorrowingViewSet(
 
     def destroy(self, request, *args, **kwargs):
         borrowing = self.get_object()
-
         if borrowing.actual_return_date:
             self.perform_destroy(borrowing)
-
             message = (
                 f"BOOK DELETED ❌\n"
                 f"\n"
@@ -283,7 +276,6 @@ class BorrowingViewSet(
                 {"detail": "Book has been deleted successfully"},
                 status=status.HTTP_204_NO_CONTENT
             )
-
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -293,6 +285,7 @@ class PaymentViewSet(
     queryset = Payment.objects.all()
     serializer_class = PaymentSerializer
     permission_classes = [permissions.IsAuthenticated]
+    pagination_class = Pagination
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
