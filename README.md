@@ -96,6 +96,8 @@ $ python manage.py migrate
 
 📍Telegram notifications
 
+📍Online payment (with Stripe)
+
 <br>
 
 <hr>
@@ -115,6 +117,18 @@ $ python manage.py migrate
 
 <br>
 
+## 💵🆕 Payment
+
+### This project implemented the ability to pay for borrowing a book online. Stripe is used for this.
+
+![pc](xpictures/pc.png)
+
+<em>
+"Stripe provides a set of programmable APIs and tools to let you facilitate payments and pay out sellers globally. 
+From verifying your sellers' identities to routing payments, Stripe makes it easy for platforms and marketplaces to manage their payments while remaining compliant."
+</em>
+<br>
+<br>
 <hr>
 
 <h2>📚🐋 Library Service and Docker</h2>
