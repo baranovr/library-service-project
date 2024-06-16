@@ -319,7 +319,7 @@ class PaymentViewSet(
             {"session_url": session.url}, status=status.HTTP_201_CREATED
         )
 
-    @action(detail=False, methods=["get"])
+    @action(detail=False, methods=["GET"])
     def success(self, request):
         session_id = request.query_params.get("session_id")
 
@@ -343,6 +343,6 @@ class PaymentViewSet(
             status=status.HTTP_400_BAD_REQUEST
         )
 
-    @action(detail=False, methods=["get"])
+    @action(detail=False, methods=["GET"])
     def cancel(self, request):
         return Response({"message": "Payment canceled"})
