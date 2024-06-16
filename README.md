@@ -100,18 +100,18 @@ $ python manage.py migrate
 
 <hr>
 
-<h2>🔔 Telegram notifications</h2>
+## 🔔 Telegram notifications
 
-### ![telegram](xpictures/logo.png)
-<h3>The service has the ability to receive notifications during the creation of a new book, 
-new borrowing and deletion of a book.</h3>
+![telegram](xpictures/logo.png)
 
-## Example:
+
+### The service has the ability to receive notifications during the creation of a new book, new borrowing and deletion of a book.
+
+## Example👇:
 ![example](xpictures/example.png)
 
 
-<h5>It is also possible to receive notifications regarding book debt. 
-This is done using Celery.</h5>
+#### It is also possible to receive notifications regarding book debt. This is done using Celery.
 
 <br>
 
