@@ -20,3 +20,4 @@ def check_overdue_borrowings():
             f"Expected return date📆: {borrowing.expected_return_date}\n"
         )
         send_telegram_notification(message)
+        time.sleep(0.5)
