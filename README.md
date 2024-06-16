@@ -16,7 +16,7 @@ The project presents four models:<br>
 
 **Here you can you see the database structure:**
 
-![db_structure](db_structure.png)
+![db_structure](xpictures/db_structure.png)
 
 The application has simple connections between the models.
 It is important to note that the User model has created using **build-in Django** model and placed in separate app (`user/`).
@@ -100,12 +100,14 @@ $ python manage.py migrate
 
 <hr>
 
-<h2>![telegram](icon.png) Telegram notifications</h2>
+<h2>🔔 Telegram notifications</h2>
+
+### ![telegram](xpictures/logo.png)
 <h5>The service has the ability to receive notifications during the creation of a new book, 
 new borrowing and deletion of a book.</h5>
 
 ### Example:
-![example](example.png)
+![example](xpictures/example.png)
 
 
 <h5>It is also possible to receive notifications regarding book debt. 
