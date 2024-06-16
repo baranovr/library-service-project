@@ -103,10 +103,10 @@ $ python manage.py migrate
 <h2>🔔 Telegram notifications</h2>
 
 ### ![telegram](xpictures/logo.png)
-<h5>The service has the ability to receive notifications during the creation of a new book, 
-new borrowing and deletion of a book.</h5>
+<h3>The service has the ability to receive notifications during the creation of a new book, 
+new borrowing and deletion of a book.</h3>
 
-### Example:
+## Example:
 ![example](xpictures/example.png)
 
 
