@@ -130,7 +130,7 @@ How to use (Docker should be installed)👇:
 docker-compose build
 docker-compose up
 ```
-
+<br>
 <hr>
 
 ## 👮‍♂️ Create Super User
