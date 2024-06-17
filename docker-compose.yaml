@@ -1,0 +1,61 @@
+services:
+  app:
+    build:
+      context: .
+    env_file:
+      - .env
+    ports:
+      - "8001:8000"
+    command: >
+      sh -c "python manage.py wait_for_db &&
+            python manage.py migrate && 
+            python manage.py runserver 0.0.0.0:8000"
+    depends_on:
+      - db
+
+  db:
+    image: postgres:16.2-alpine3.19
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "5432:5432"
+    volumes:
+      - my_db:$PGDATA
+
+  redis:
+    image: redis:latest
+    restart: on-failure
+    ports:
+      - "6379:6379"
+
+  celery-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: "celery -A library_service worker --loglevel=info"
+    depends_on:
+      - db
+      - redis
+      - app
+    restart: on-failure
+    env_file:
+      - .env
+
+  celery-beat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: "celery -A library_service beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler"
+    depends_on:
+      - db
+      - redis
+      - app
+    restart: on-failure
+    env_file:
+      - .env
+
+
+volumes:
+  my_db:
+  my_media:
