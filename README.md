@@ -136,7 +136,7 @@ For convenient development and transfer of the project to other users, Docker wa
 The image has been uploaded to Docker Hub:
 
 ### Link👇:
-> https://hub.docker.com/repository/docker/baranovr/social_media_platform-app/general
+> https://hub.docker.com/repository/docker/baranovr/library_service_project-app/general
 
 How to use (Docker should be installed)👇:
 
