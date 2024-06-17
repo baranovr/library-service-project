@@ -13,7 +13,6 @@ services:
     depends_on:
       - db
 
-
   db:
     image: postgres:16.2-alpine3.19
     restart: always
@@ -23,6 +22,38 @@ services:
       - "5432:5432"
     volumes:
       - my_db:$PGDATA
+
+  redis:
+    image: redis:latest
+    restart: on-failure
+    ports:
+      - "6379:6379"
+
+  celery-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: "celery -A library_service worker --loglevel=info"
+    depends_on:
+      - db
+      - redis
+      - app
+    restart: on-failure
+    env_file:
+      - .env
+
+  celery-beat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: "celery -A library_service beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler"
+    depends_on:
+      - db
+      - redis
+      - app
+    restart: on-failure
+    env_file:
+      - .env
 
 
 volumes:
